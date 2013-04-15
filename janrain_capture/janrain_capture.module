@@ -733,6 +733,7 @@ function widget_js() {
   // backplane
   $settings["capture.backplane"]          = $janrain_settings['backplane_enabled'];
   $settings["capture.backplaneBusName"]   = $janrain_settings['backplane_bus_name'];
+  $settings["capture.backplaneVersion"]   = $janrain_settings['backplane_version'];
 
   $folder_url  = $janrain_settings['screens_folder'];
 
@@ -847,12 +848,14 @@ EOD;
   janrain.settings.tokenAction = 'event';
 
 EOD;
-
+  
+  // Backplane
   if($settings["capture.backplane"]) {
     $output .= <<<EOD
   // backplane settings
   janrain.settings.capture.backplane = '{$settings["capture.backplane"]}';
   janrain.settings.capture.backplaneBusName = '{$settings["capture.backplaneBusName"]}';
+  janrain.settings.capture.backplaneVersion = '{$settings["capture.backplaneVersion"]}';
 
 EOD;
   }
