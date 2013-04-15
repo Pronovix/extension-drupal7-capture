@@ -746,18 +746,36 @@ function widget_js() {
     //watchdog('janrain_capture', 'Searching for Capture screen stylesheets in: ' . $fs_path,  array(), WATCHDOG_DEBUG);
     $web_url = $base_url . $web_path;
 
-    // check the stylesheets folder for css files
-    $dir = NULL;
+    $is_nested = is_dir($fs_path.'stylesheets');
+
+    if ($is_nested) {
+      $fs_path .= "stylesheets";
+    }
+
     try {
-      $dir = new DirectoryIterator($fs_path."stylesheets");
+      $dir = new DirectoryIterator($fs_path);
     }
     catch (UnexpectedValueException $e) {
+      if ($is_nested) {
+        $screens_message = 'No "stylesheets" subfolder found in the screens folder (@path). Please check the Janrain Capture module settings.';
+        
+      } else {
+        $screens_message = 'The screens folder (@path) could not be found. Please check the Janrain Capture module settings.';
+      }
+
       watchdog('janrain_capture',
-               'No "stylesheets" subfolder found in the Screens Folder (@path). Please check the Janrain Capture module settings.',
+               $screens_message,
                array('@path' => $fs_path),
                WATCHDOG_WARNING,
                l(t('Janrain Capture module settings'), 'admin/config/people/janrain_capture'));
+
+      return;
     }
+
+    if ($is_nested) {
+      $web_url .= "stylesheets/";
+    }
+
     $css = array();
     $css_mobile = array();
     $css_ie = array();
@@ -768,15 +786,15 @@ function widget_js() {
           switch (true){
             // if file begins with mobile set is as a mobile style
           case (stripos($fn, 'mobile') === 0):
-            $css_mobile[] = "'{$web_url}stylesheets/{$fn}'";
+            $css_mobile[] = "'{$web_url}{$fn}'";
             break;
             // if file begins with ie set is as an IE style
           case (stripos($fn, 'ie') === 0):
-            $css_ie[] = "'{$web_url}stylesheets/{$fn}'";
+            $css_ie[] = "'{$web_url}{$fn}'";
             break;
             // otherwise set it as a normal style
           default:
-            $css[] = "'{$web_url}stylesheets/{$fn}'";
+            $css[] = "'{$web_url}{$fn}'";
             break;
           }
         }
@@ -788,6 +806,15 @@ function widget_js() {
   } else {
     // just grab a single remote sheet
     $settings["capture.stylesheets"] = "'{$folder_url}styles.css'";
+  }
+
+  // Log a warning if directories are setup properly but no stylesheets were found
+  if (!count($css) && !count($css_mobile) && !count($css_ie)) {
+    watchdog('janrain_capture',
+               'No stylesheets were found in the screens folder (@path). Please check the Janrain Capture module settings.',
+               array('@path' => $fs_path),
+               WATCHDOG_WARNING,
+               l(t('Janrain Capture module settings'), 'admin/config/people/janrain_capture'));
   }
 
   $output = <<<EOD
