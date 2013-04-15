@@ -1,0 +1,257 @@
+<?php
+
+/**
+ * @file
+ * This module implements UI elements for Janrain Capture
+ *
+ * @see http://www.janrain.com/products/capture
+ */
+
+/**
+ * Implements hook_init().
+ */
+function janrain_capture_ui_init() {
+  // Don't do anything if the module settings have not been configured.
+  if (!janrain_capture_configured()) {
+    return;
+  }
+
+  $js_css = janrain_capture_ui_js_css();
+
+  foreach ($js_css as $type => $files) {
+    foreach ($files as $name => $filename) {
+      // Find the location of the library file and add it using the appropriate
+      // function, i.e. drupal_add_js or drupal_add_css.
+      $full_path = janrain_capture_ui_get_library_path($name) . '/' . $filename;
+      $drupal_add = 'drupal_add_' . $type;
+      $drupal_add($full_path, array('every_page' => TRUE));
+    }
+  }
+  // Finally, add the custom JavaScript.
+  drupal_add_js(drupal_get_path('module', 'janrain_capture') . '/janrain_capture_ui.js', array('every_page' => TRUE, 'weight' => 10));
+}
+
+/**
+ * Helper function as a centralized list of JS and CSS files.
+ */
+function janrain_capture_ui_js_css() {
+  $js_css = array(
+    'js' => array(
+      'fancybox' => 'jquery.fancybox-1.3.4.pack.js',
+    ),
+    'css' => array(
+      'fancybox' => 'jquery.fancybox-1.3.4.css',
+    )
+  );
+  return $js_css;
+}
+
+/**
+ * Find the location of library JS and CSS files.
+ */
+function janrain_capture_ui_get_library_path($name) {
+  $lib_paths = &drupal_static(__FUNCTION__, array());
+  if (!isset($lib_paths[$name])) {
+    $cid = 'janrain_capture_libraries';
+    $cache = cache_get($cid);
+
+    if (!empty($cache->data)) {
+      $lib_paths = $cache->data;
+      if (isset($lib_paths[$name])) {
+        return $lib_paths[$name];
+      }
+    }
+
+    // Use Libraries module, if available, to find the correct path.
+    if (function_exists('libraries_get_path')) {
+      $lib_path = libraries_get_path($name);
+      if (!empty($lib_path)) {
+        $lib_paths[$name] = $lib_path;
+      }
+    }
+
+    // If we still haven't found a path, assume it's at sites/all/libraries
+    if (!isset($lib_paths[$name])) {
+      $lib_paths[$name] = 'sites/all/libraries/' . $name;
+    }
+    cache_set($cid, $lib_paths);
+  }
+  return $lib_paths[$name];
+}
+
+/**
+ * Implementation of hook_user_view to customize profile view
+ */
+function janrain_capture_ui_user_view($account) {
+  global $base_url;
+  $ver = variable_get('janrain_capture_ver', array());
+  $janrain_capture_ui = variable_get('janrain_capture_ui2', array());
+  
+  if($ver == '1.0'
+      || isset($janrain_capture_ui['profile_enabled']) == false
+      || $janrain_capture_ui['profile_enabled'] != 1) {
+    return $account;
+  }
+  $uuid = $account->field_janrain_capture_uuid['und'][0]['value'];
+  $screen = _janrain_capture_get_screen('public-profile.html');
+
+  $account->content = array();
+  $account->content['summary'] = array(
+      '#type' => 'user_profile_item',
+      '#title' => t('Profile'),
+      '#markup' => '<div id="janrain-capture-view-profile">'.$screen.'</div>
+      <script>
+      if(window.location.search != "?uuid='.$uuid.'") {
+        window.location.search = "?uuid='.$uuid.'";
+       }
+      jQuery(document).ready(function(){
+       if (jQuery(".profile").parent().attr("class") != "fieldset-wrapper") {
+        jQuery(".profile").wrap("<div class=\"fieldset-wrapper\">");
+        jQuery(".fieldset-wrapper").wrap("<fieldset class=\"form-wrapper\" id=\"view-profile\">");
+       }
+      });
+       </script>',
+      '#attributes' => array('class' => array()),
+   );
+
+  if ($js = _janrain_capture_get_screen("public-profile.js")) {
+    // JS for the profile screen that should go into <head> before the widget.
+    drupal_add_js($js, array('type' => 'inline', 'every_page' => TRUE, 'weight' => 2));
+  }
+
+  return $account;
+}
+
+/**
+ * Implements hook_form_FROM_ID_alter().
+ */
+function janrain_capture_ui_form_user_profile_form_alter(&$form, &$form_state) {
+  global $user;
+  global $base_url;
+
+  if ($form['#user_category'] != 'account') {
+    // @todo - should core profile module tabs be blocked?
+    return;
+  }
+  unset($form['#validate']);
+  $account = $form['#user'];
+  $enforce = variable_get('janrain_capture_enforce', FALSE);
+
+  if ($enforce || janrain_capture_mapping_exists($account->uid)) {
+    // Account information.
+    $form['profile'] = array(
+      '#type' => 'fieldset',
+      '#weight' => -10,
+    );
+    $form['account'] = array(
+      '#type' => 'fieldset',
+      '#weight' => 1,
+    );
+    if ($user->uid == $account->uid) {
+      // test 1.0 or 2.0
+      $ver = variable_get('janrain_capture_ver', array());
+      if($ver == '2.0') {
+        
+        $janrain_capture_ui = variable_get('janrain_capture_ui2', array());
+        if(isset($janrain_capture_ui['profile_enabled']) == false
+            || $janrain_capture_ui['profile_enabled'] != 1) {
+          
+          unset($form['profile']);
+          unset($form['account']);
+          unset($form['field_janrain_capture_uuid']);
+          $form['account']['mail'] = array(
+            '#type' => 'item',
+            '#title' => t('E-mail address'),
+            '#markup' => check_plain($account->mail),
+          );
+          
+          return;
+        }
+        
+        // grab the edit profile screen
+        $result = _janrain_capture_get_screen("edit-profile.html");
+
+        $addme ="";
+        if (REQUEST_TIME >= $_SESSION['janrain_capture_expires_in']) {
+          $api = new JanrainCaptureApi();
+          $api->refreshAccessToken();
+          $access_token = $_SESSION['janrain_capture_access_token'];
+          $addme = "<script type='text/javascript'>access_token = '$access_token';</script>";
+        }
+        $result = $addme . $result;
+        $profile = Array('#markup' => '
+            '.$result.'
+            <script type="text/javascript">
+           jQuery(document).ready(function(){
+            jQuery("#user-profile-form").after(jQuery("#janrain-edit-wrapper")).remove();
+              if (jQuery("#janrain-edit-wrapper").parent().attr("class") != "fieldset-wrapper") {
+                jQuery("#janrain-edit-wrapper").wrap("<div class=\"fieldset-wrapper\">");
+                jQuery(".fieldset-wrapper").wrap("<fieldset class=\"form-wrapper\" id=\"edit-profile\">");
+               }
+           });
+            </script>'
+        );
+        
+          $form['profile'] = array(
+          '#type' => 'item',
+          '#title' => t('Profile'),
+          $profile
+        );
+
+          if ($js = _janrain_capture_get_screen("edit-profile.js")) {
+            // JS for the edit profile screen that should go into <head> before the widget.
+            drupal_add_js($js, array('type' => 'inline', 'every_page' => TRUE, 'weight' => 2));
+          }
+
+          return;
+      } else {
+        $profile = Array('#markup' => '<div style="height:1300px;"></div>
+            <script type="text/javascript">jQuery("#edit-janrain-capture-profile").html("<iframe width=\"900\" height=\"1300\" frameborder=\"0\" src=\"'.$base_url.'/janrain_capture/profile\" />");</script>'
+        );
+      }
+    } else {
+       $profile = array('#markup' => t('Profile managed in Janrain Capture'));
+    }
+
+     $form['profile']['janrain_capture_profile'] = array(
+      '#type' => 'item',
+      '#title' => t('Profile'),
+      $profile
+     );
+     $form['account']['mail'] = array(
+      '#type' => 'item',
+      '#title' => t('E-mail address'),
+      '#markup' => check_plain($account->mail),
+    );
+  }
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function janrain_capture_ui_block_info() {
+  return array(
+    'janrain_capture' => array(
+      'info' => t('Janrain Capture user login'),
+      'cache' => DRUPAL_NO_CACHE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function janrain_capture_ui_block_view($delta) {
+  if (!janrain_capture_configured()) {
+    return array();
+  }
+  $block = array();
+  switch ($delta) {
+    case 'janrain_capture':
+      $block['subject'] = t('Janrain Capture');
+      $block['content'] = janrain_capture_block_content();
+      break;
+  }
+
+  return $block;
+}

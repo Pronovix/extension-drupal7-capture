@@ -1,0 +1,7 @@
+name = Janrain Capture
+description = Enable centralized storage of social profile data to easily manage it and target reporting using the Janrain Capture service.
+package = Janrain Capture
+core = 7.x
+configure = admin/config/people/janrain_capture
+files[] = janrain_capture.api.inc
+stylesheets[all][] = janrain_capture.css
