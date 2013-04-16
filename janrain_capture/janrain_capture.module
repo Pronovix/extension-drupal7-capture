@@ -462,10 +462,12 @@ function janrain_capture_url($options = NULL) {
       $url = 'https://'
         . (!empty($janrain_capture_optional['captureui_address']) ? $janrain_capture_optional['captureui_address'] : $janrain_capture_main['capture_address'])
         . '/oauth/' . $action . '?' . http_build_query($args, '', '&');
-    } else {
+    }
+    else {
       return '';
     }
-  } else {
+  }
+  else {
     return '';
   }
   return $url;
