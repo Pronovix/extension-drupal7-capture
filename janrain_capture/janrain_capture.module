@@ -969,7 +969,7 @@ EOD;
 {$access_token}
 
 EOD;
-  dpm('SSO URL: '.janrain_capture_url());
+  
   return $output;
 }
 
