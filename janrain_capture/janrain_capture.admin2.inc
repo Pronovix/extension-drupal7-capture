@@ -136,6 +136,19 @@ function janrain_capture_settings() {
     '#default_value' => isset($janrain_capture_backplane['backplane_enabled']) ? $janrain_capture_backplane['backplane_enabled'] : 0,
     '#description' => t('Enable/Disable Backplane for Capture 2.0'),
   );
+
+  $options = array(
+    '1.2' => t('1.2'),
+    '2' => t('2.0'),
+  );
+
+  $form['janrain_capture_backplane2']['backplane_version'] = array(
+    '#type' => 'radios',
+    '#title' => t('Backplane Version'),
+    '#options' => $options,
+    '#default_value' => $options['2'],
+  );
+
   $form['janrain_capture_backplane2']['backplane_bus_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Backplane bus name'),
