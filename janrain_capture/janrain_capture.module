@@ -331,6 +331,50 @@ function janrain_capture_oauth_access_callback() {
 }
 
 /**
+ * Implements hook_token_info().
+ * Provide a token for:
+ * - SSO URL
+ *  ` the href attribute of the sign-in link. Allows
+ *    use of the URL in Content (where tokens are available)
+ */
+function janrain_capture_token_info() {
+  $types['janrain_capture'] = array(
+    'name' => t("Janrain Capture Tokens"),
+    'description' => t("Tokens for Janrain Capture."),
+  );
+  
+  // Janrain Capture specific tokens.
+  $janrain_capture['sso_url'] = array(
+    'name' => t("Janrain SSO URL"),
+    'description' => t("A link for Social Sign-On using Janrain Capture"),
+  );
+  return array(
+    'types' => $types,
+    'tokens' => array(
+      'janrain_capture' => $janrain_capture,
+    ),
+  );
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function janrain_capture_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+  
+  if ($type == 'janrain_capture') {
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'sso_url':
+          $replacements[$original] = janrain_capture_url();
+        break;
+      }
+    }
+  }
+  return $replacements;
+}
+
+/**
  * Access callback for janrain_capture_token_expired().
  */
 function janrain_capture_token_expired_access($token) {
@@ -418,10 +462,12 @@ function janrain_capture_url($options = NULL) {
       $url = 'https://'
         . (!empty($janrain_capture_optional['captureui_address']) ? $janrain_capture_optional['captureui_address'] : $janrain_capture_main['capture_address'])
         . '/oauth/' . $action . '?' . http_build_query($args, '', '&');
-    } else {
+    }
+    else {
       return '';
     }
-  } else {
+  }
+  else {
     return '';
   }
   return $url;
@@ -926,7 +972,7 @@ EOD;
 {$access_token}
 
 EOD;
-
+  
   return $output;
 }
 
