@@ -477,22 +477,22 @@ function janrain_capture_url($options = NULL) {
  * Implements hook_url_outbound_alter().
  */
 function janrain_capture_url_outbound_alter(&$path, &$options, $original_path) {
-  // Override lougout link
-  //var_dump($path);
+  // Override logout link
   switch ($path) {
     case 'user/logout':
       $ver = variable_get('janrain_capture_ver', array());
-      $conf = ($ver == '1.0') ?
-        variable_get('janrain_capture_optional', array()) :
-        variable_get('janrain_capture_federate2', array());
 
-      if($conf['capture_sso_address']
+      if ($ver == '1.0') {
+        $conf = variable_get('janrain_capture_optional', array())
+
+        if($conf['capture_sso_address']
          && !(isset($conf['capture_sso_enabled']) && !$conf['capture_sso_enabled'])
          && !isset($options['real_logout'])) {
-
-        $path = 'javascript:CAPTURE.logout()';
-        $options['external'] =TRUE;
+          $path = 'javascript:CAPTURE.logout()';
+          $options['external'] =TRUE;
+        }
       }
+
       break;
   }
 }
