@@ -97,7 +97,7 @@ function janrain_capture_settings() {
   $form['janrain_capture_ui2']['recaptcha_key'] = array(
     '#type' => 'textfield',
     '#title' => t('Recaptcha Public Key'),
-    '#default_value' => !empty($janrain_capture_ui['recaptcha_key']) ? $janrain_capture_ui['recaptcha_key'] : '',
+    '#default_value' => !empty($janrain_capture_ui['recaptcha_key']) ? $janrain_capture_ui['recaptcha_key'] : '6LeVKb4SAAAAAGv-hg5i6gtiOV4XrLuCDsJOnYoP',
     '#description' => t('Your Recaptcha Public Key'),
   );
     
