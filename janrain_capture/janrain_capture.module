@@ -1363,6 +1363,11 @@ function _janrain_capture_get_screen($fname) {
     $result = file_get_contents($path);
   }
   else {
+    if (!ctype_alnum($fname)) {
+      header('HTTP/1.1 500 Internal Server Error');
+      die();
+    }
+
     $url .= $fname;
     $resp = drupal_http_request($url);
     if (isset($resp->error)) {
