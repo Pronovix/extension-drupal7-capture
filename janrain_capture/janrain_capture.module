@@ -1371,7 +1371,7 @@ function _janrain_capture_get_screen($fname) {
     $url .= $fname;
     $resp = drupal_http_request($url);
     if (isset($resp->error)) {
-      watchdog('janrain_capture', 'Failed to retrieve a Capture screen with the following URL: ' . $url, array(),  WATCHDOG_WARNING);
+      watchdog('janrain_capture', 'Failed to retrieve a Capture screen with the following URL: %url', array('%url' => $url),  WATCHDOG_WARNING);
       $result = '';
     }
     else {
