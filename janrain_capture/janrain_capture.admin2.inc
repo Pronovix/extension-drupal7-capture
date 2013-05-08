@@ -76,12 +76,12 @@ function janrain_capture_settings() {
     '#default_value' => isset($janrain_capture_ui['profile_enabled']) ? $janrain_capture_ui['profile_enabled'] : 1,
     '#description' => t('Enable/Disable overriding the standard Drupal Profiles'),
   );
-  $form['janrain_capture_ui2']['load_js'] = array(
+  /*$form['janrain_capture_ui2']['load_js'] = array(
     '#type' => 'textfield',
     '#title' => t('Url for load.js file'),
     '#default_value' => !empty($janrain_capture_ui['load_js']) ? $janrain_capture_ui['load_js'] : 'd16s8pqtk4uodx.cloudfront.net/default/load.js',
     '#description' => t('The absolute url (minus protocol) of the Widget load.js file<br/>(example: d16s8pqtk4uodx.cloudfront.net/default/load.js)'),
-  );
+  );*/
   $form['janrain_capture_ui2']['registration_flow'] = array(
     '#type' => 'textfield',
     '#title' => t('Registration Flow'),
@@ -355,6 +355,14 @@ function janrain_capture_settings_validate2($form, &$form_state) {
  * Submit callback for the settings form.
  */
 function janrain_capture_settings_submit2($form, &$form_state) {
+  //Parse engage app name to load.js path. If engage address is given engage app name will be parsed else default will be parsed.
+  $engageAppUrl = $form_state['values']['janrain_capture_main2']['engage_address'];
+  if($engageAppUrl!=''){
+      $engageAppName  = strstr( parse_url( $engageAppUrl, PHP_URL_HOST ), '.', true);   
+  } else {
+      $engageAppName  = 'default';
+  }
+  $form_state['values']['janrain_capture_ui2']['load_js'] = 'd16s8pqtk4uodx.cloudfront.net/'.$engageAppName.'/load.js';
   // Store the comma-separated list of share providers as an array.
   if(!empty($form_state['values']['janrain_capture_share']['nodes']['providers'])) {
     $providers = $form_state['values']['janrain_capture_share']['nodes']['providers'];
