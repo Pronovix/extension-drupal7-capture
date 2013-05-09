@@ -76,12 +76,6 @@ function janrain_capture_settings() {
     '#default_value' => isset($janrain_capture_ui['profile_enabled']) ? $janrain_capture_ui['profile_enabled'] : 1,
     '#description' => t('Enable/Disable overriding the standard Drupal Profiles'),
   );
-  /*$form['janrain_capture_ui2']['load_js'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Url for load.js file'),
-    '#default_value' => !empty($janrain_capture_ui['load_js']) ? $janrain_capture_ui['load_js'] : 'd16s8pqtk4uodx.cloudfront.net/default/load.js',
-    '#description' => t('The absolute url (minus protocol) of the Widget load.js file<br/>(example: d16s8pqtk4uodx.cloudfront.net/default/load.js)'),
-  );*/
   $form['janrain_capture_ui2']['registration_flow'] = array(
     '#type' => 'textfield',
     '#title' => t('Registration Flow'),
