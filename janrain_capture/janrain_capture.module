@@ -1363,9 +1363,12 @@ function _janrain_capture_get_screen($fname) {
     $result = file_get_contents($path);
   }
   else {
-    if (!ctype_alnum($fname)) {
-      header('HTTP/1.1 500 Internal Server Error');
-      die();
+    $url_type = isset( $_REQUEST['url_type'] ) ? $_REQUEST['url_type'] : false;
+
+    // allow only alpha-numeric (and dashes) to prevent hijacking
+    if ( ! ctype_alnum( str_replace( '-', '', $url_type ) ) ) {
+      header( 'HTTP/1.1 400 Bad Request' );
+      exit();
     }
 
     $url .= $fname;
