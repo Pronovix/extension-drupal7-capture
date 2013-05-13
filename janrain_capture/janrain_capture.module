@@ -521,16 +521,6 @@ function janrain_capture_menu_alter(&$items) {
     // All password reset requests should go via Capture.
     $items['user/password']['access callback'] = FALSE;
   }
-
-  $janrain_capture_ver = variable_get('janrain_capture_ver', array());
-  // $ver = !empty($janrain_capture_ver) ? $janrain_capture_ver : '1.0';
-  // $ver = substr($ver,0,1);
-
-  dpm('jcv: ' . $janrain_capture_ver);
-
-  if ($janrain_capture_ver == '1.0' || empty($janrain_capture_ver)) {
-    $items['admin/config/people/janrain_capture/settings_capture']['access callback'] = FALSE;
-  }
 }
 
 

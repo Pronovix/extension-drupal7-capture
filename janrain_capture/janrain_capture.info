@@ -6,4 +6,5 @@ configure = admin/config/people/janrain_capture
 files[] = janrain_capture.api.inc
 files[] = janrain_capture.admin.inc
 files[] = janrain_capture.admin2.inc
+files[] = janrain_capture_admin_version.inc
 stylesheets[all][] = janrain_capture.css
