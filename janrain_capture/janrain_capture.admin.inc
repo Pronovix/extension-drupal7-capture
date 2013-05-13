@@ -15,16 +15,6 @@ function janrain_capture_settings() {
   $janrain_capture_ver = variable_get('janrain_capture_ver', array());
   $ver = !empty($janrain_capture_ver) ? $janrain_capture_ver : '1.0';
   
-  $form['janrain_capture_ver'] = array(
-    '#type' => 'select',
-    '#title' => t('Capture Version'),
-    '#options' => array(
-      '2.0' => t('Capture'),
-      '1.0' => t('Capture Legacy'),
-    ),
-    '#default_value' => !empty($janrain_capture_ver) ? $janrain_capture_ver : '1.0',
-    '#description' => t('Which version of Capture are you using? Chose and save before configuring. Settings below will change accordingly and are stored separately.'),
-  );
   $janrain_capture_main = variable_get('janrain_capture_main', array());
   $form['janrain_capture_main'] = array(
     '#type' => 'fieldset',

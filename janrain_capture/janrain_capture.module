@@ -197,10 +197,25 @@ function janrain_capture_ini($ver = '1.0') {
 }
 
 /**
+ * Settings menu item callback
+ */
+function janrain_capture_get_settings() {
+  $janrain_capture_ver = variable_get('janrain_capture_ver', array());
+  $ver = !empty($janrain_capture_ver) ? $janrain_capture_ver : '1.0';
+
+  if ($ver == '1.0') {
+    include_once drupal_get_path('module', 'janrain_capture') . '/janrain_capture.admin.inc';
+  } else {
+    include_once drupal_get_path('module', 'janrain_capture') . '/janrain_capture.admin2.inc';
+  }
+
+  return drupal_get_form('janrain_capture_settings');
+}
+
+/**
  * Implements hook_menu().
  */
 function janrain_capture_menu() {
-
   $items['janrain_capture/oauth'] = array(
     'title' => 'Capture Oauth Receiver',
     'page callback' => 'janrain_capture_oauth',
@@ -257,19 +272,19 @@ function janrain_capture_menu() {
     'title' => 'Janrain Capture',
     'description' => t('Connect to Janrain Capture service for centralized storage of social profile data.'),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('janrain_capture_settings'),
+    'page arguments' => array('janrain_capture_version_settings'),
     'access arguments' => array('administer site configuration'),
     'weight' => -4,
-    'file' => "janrain_capture.admin$ver.inc",
+    'file' => "janrain_capture.admin_version.inc",
   );
-  $items['admin/config/people/janrain_capture/settings'] = array(
-    'title' => 'Settings',
+  $items['admin/config/people/janrain_capture/version'] = array(
+    'title' => 'Version',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('janrain_capture_settings'),
+    'page arguments' => array('janrain_capture_version_settings'),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-    'file' => "janrain_capture.admin$ver.inc",
+    'weight' => -50,
+    'file' => "janrain_capture.admin_version.inc",
   );
   $items['janrain_capture/token_expired/%'] = array(
     'title' => 'Capture Token Expired',
@@ -279,22 +294,12 @@ function janrain_capture_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'janrain_capture.pages.inc',
   );
-  // in case of emergency go here
-  $items['admin/config/people/janrain_capture/settings2'] = array(
+  $items['admin/config/people/janrain_capture/settings'] = array(
     'title' => 'Settings',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('janrain_capture_settings'),
+    'page callback' => 'janrain_capture_get_settings',
     'access arguments' => array('administer site configuration'),
-    'weight' => -10,
-    'file' => "janrain_capture.admin2.inc",
-  );
-  $items['admin/config/people/janrain_capture/settings1'] = array(
-    'title' => 'Settings',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('janrain_capture_settings'),
-    'access arguments' => array('administer site configuration'),
-    'weight' => -10,
-    'file' => "janrain_capture.admin.inc",
+    'weight' => -30,
+    'type' => MENU_LOCAL_TASK,
   );
 
   // Create a no frills logout URL if SSO is enabled.
@@ -515,6 +520,16 @@ function janrain_capture_menu_alter(&$items) {
     $items['user']['access callback'] = 'user_is_logged_in';
     // All password reset requests should go via Capture.
     $items['user/password']['access callback'] = FALSE;
+  }
+
+  $janrain_capture_ver = variable_get('janrain_capture_ver', array());
+  // $ver = !empty($janrain_capture_ver) ? $janrain_capture_ver : '1.0';
+  // $ver = substr($ver,0,1);
+
+  dpm('jcv: ' . $janrain_capture_ver);
+
+  if ($janrain_capture_ver == '1.0' || empty($janrain_capture_ver)) {
+    $items['admin/config/people/janrain_capture/settings_capture']['access callback'] = FALSE;
   }
 }
 
