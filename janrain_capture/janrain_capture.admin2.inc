@@ -318,15 +318,6 @@ function janrain_capture_settings_validate2($form, &$form_state) {
   if ($form_state['values']['janrain_capture_share']['enabled'] && empty($form_state['values']['janrain_capture_main2']['engage_address'])) {
     form_set_error('janrain_capture_main2][engage_address', t('You must provide an Engage URL in order to enable social share.'));
   }
-
-  $v = strtolower($form_state['values']['janrain_capture_ui2']['screens_folder']);
-  if ($v
-      && strpos($v, 'file:///', 0) !== 0
-      && strpos($v, 'http://', 0) !== 0
-      && strpos($v, 'https://', 0) !== 0) {
-
-    form_set_error('janrain_capture_ui2][screens_folder', t('Capture screens folder URL: unknown scheme. Examples of valid URLs: file:///sites/all/themes/janrain-capture-screens/, http://example.com/capture-screens/)'));
-  }
 }
 
 /**
@@ -353,11 +344,4 @@ function janrain_capture_settings_submit2($form, &$form_state) {
 
   // Rebuild the menu in case the "enforce" setting changed.
   variable_set('menu_rebuild_needed', TRUE);
-
-  // Make sure there's a trailing slash in the capture screens folder URL.
-  $v = strtolower($form_state['values']['janrain_capture_ui2']['screens_folder']);
-  if ($v) {
-    $v = rtrim($v, '/') . '/';
-  }
-  $form_state['values']['janrain_capture_ui2']['screens_folder'] = $v;
 }

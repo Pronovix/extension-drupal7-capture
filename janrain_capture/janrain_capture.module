@@ -805,7 +805,8 @@ function widget_js() {
     }
   }
   else {
-    $folder_url  = $janrain_settings['screens_folder'];
+    //$folder_url  = $janrain_settings['screens_folder'];
+    $folder_url = variable_get('janrain_capture_screens_folder', array());
 
     // If path is local, search for user agent-specific stylesheets in the file system.
     if(strpos($folder_url, 'file:///', 0) === 0) {
@@ -1388,12 +1389,12 @@ function _janrain_capture_get_screen($fname) {
     return '';
   }
   else {
-    $conf = variable_get('janrain_capture_ui2', array());
-    if (!isset($conf['screens_folder'])) {
+    $url = variable_get('janrain_capture_screens_folder', array());
+    if (!isset($url)) {
       watchdog('janrain_capture', 'No Capture screens folder specified in the Janrain Capture settings.',  array(), WATCHDOG_WARNING);
       return '';
     }
-    $url = $conf['screens_folder'];
+    //$url = $conf['screens_folder'];
 
     if (strpos($url, 'file:///', 0) === 0) {
       global $base_path;
