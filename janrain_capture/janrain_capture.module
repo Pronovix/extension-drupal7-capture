@@ -286,6 +286,15 @@ function janrain_capture_menu() {
     'weight' => -50,
     'file' => "janrain_capture.admin_version.inc",
   );
+  $items['admin/config/people/janrain_capture/screens'] = array(
+    'title' => 'Screens',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('janrain_capture_screens_settings'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => -40,
+    'file' => "janrain_capture.admin_screens.inc",
+  );
   $items['janrain_capture/token_expired/%'] = array(
     'title' => 'Capture Token Expired',
     'page callback' => 'janrain_capture_token_expired',

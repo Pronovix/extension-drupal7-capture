@@ -72,12 +72,6 @@ function janrain_capture_settings() {
     '#default_value' => !empty($janrain_capture_ui['registration_flow']) ? $janrain_capture_ui['registration_flow'] : 'socialRegistration',
     '#description' => t('Change this only when instructed to do so<br/>(default: socialRegistration)'),
   );
-  $form['janrain_capture_ui2']['screens_folder'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Screens Folder'),
-    '#default_value' => !empty($janrain_capture_ui['screens_folder']) ? $janrain_capture_ui['screens_folder'] : 'file:///sites/all/themes/janrain-capture-screens/',
-    '#description' => t('URL of the Capture screens folder<br/>(examples: file:///sites/all/themes/janrain-capture-screens/, http://example.com/capture-screens/)'),
-  );
   $form['janrain_capture_ui2']['recaptcha_key'] = array(
     '#type' => 'textfield',
     '#title' => t('Recaptcha Public Key'),
