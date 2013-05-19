@@ -1378,11 +1378,11 @@ function janrain_capture_theme() {
  */
 function _janrain_capture_get_screen($fname) {
   if (module_exists('janrain_capture_admin_screens')) {
-    if (!in_array($file_name, _janrain_capture_get_screens())) {
+    if (!in_array($fname, _janrain_capture_get_screens())) {
       return '';
     }
 
-    if ($screen_file = _janrain_capture_get_screen_file($file_name)) {
+    if ($screen_file = _janrain_capture_get_screen_file($fname)) {
       return file_get_contents($screen_file);
     }
 
