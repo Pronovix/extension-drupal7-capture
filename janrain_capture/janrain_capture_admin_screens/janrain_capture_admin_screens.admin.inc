@@ -26,7 +26,7 @@ function _janrain_capture_get_screen_title($screen) {
 /**
  * Form callback for customizing the Janrain Capture screens.
  */
-function janrain_capture_screens_settings($form, &$form_state) {
+function janrain_capture_admin_screens_settings($form, &$form_state) {
   $screens = _janrain_capture_get_screens();
 
   $form = array();
@@ -69,7 +69,7 @@ function janrain_capture_screens_settings($form, &$form_state) {
  *
  * @see http://api.drupal.org/api/drupal/developer%21topics%21forms_api_reference.html/7#managed_file
  */
-function janrain_capture_screens_settings_submit(&$form, &$form_state) {
+function janrain_capture_admin_screens_settings_submit(&$form, &$form_state) {
   $screens = _janrain_capture_get_screens();
   foreach ($screens as $screen) {
     $screen_machine_name = _janrain_capture_get_screen_machine_name($screen);
