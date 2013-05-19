@@ -1363,42 +1363,55 @@ function janrain_capture_theme() {
  * Return empty string on failure to retrieve.
  */
 function _janrain_capture_get_screen($fname) {
-  $conf = variable_get('janrain_capture_ui2', array());
-  if (!isset($conf['screens_folder'])) {
-    watchdog('janrain_capture', 'No Capture screens folder specified in the Janrain Capture settings.',  array(), WATCHDOG_WARNING);
+  if (module_exists('janrain_capture_admin_screens')) {
+    if (!in_array($file_name, _janrain_capture_get_screens())) {
+      return '';
+    }
+
+    if ($screen_file = _janrain_capture_get_screen_file($file_name)) {
+      return file_get_contents($screen_file);
+    }
+
     return '';
   }
-  $url = $conf['screens_folder'];
-
-  if (strpos($url, 'file:///', 0) === 0) {
-    global $base_path;
-
-    $path = DRUPAL_ROOT . str_replace('file://', '', $url) . $fname;
-    $result = file_get_contents($path);
-  }
   else {
-    $url_type = isset( $_REQUEST['url_type'] ) ? $_REQUEST['url_type'] : false;
-
-    // allow only alpha-numeric (and dashes) to prevent hijacking
-    if ( ! ctype_alnum( str_replace( '-', '', $url_type ) ) ) {
-      header( 'HTTP/1.1 400 Bad Request' );
-      exit();
+    $conf = variable_get('janrain_capture_ui2', array());
+    if (!isset($conf['screens_folder'])) {
+      watchdog('janrain_capture', 'No Capture screens folder specified in the Janrain Capture settings.',  array(), WATCHDOG_WARNING);
+      return '';
     }
+    $url = $conf['screens_folder'];
 
-    $url .= $fname;
-    $resp = drupal_http_request($url);
-    if (isset($resp->error)) {
-      watchdog('janrain_capture', 'Failed to retrieve a Capture screen with the following URL: %url', array('%url' => $url),  WATCHDOG_WARNING);
-      $result = '';
+    if (strpos($url, 'file:///', 0) === 0) {
+      global $base_path;
+
+      $path = DRUPAL_ROOT . str_replace('file://', '', $url) . $fname;
+      $result = file_get_contents($path);
     }
     else {
-      $result = $resp->data;
+      $url_type = isset( $_REQUEST['url_type'] ) ? $_REQUEST['url_type'] : false;
+
+      // allow only alpha-numeric (and dashes) to prevent hijacking
+      if ( ! ctype_alnum( str_replace( '-', '', $url_type ) ) ) {
+        header( 'HTTP/1.1 400 Bad Request' );
+        exit();
+      }
+
+      $url .= $fname;
+      $resp = drupal_http_request($url);
+      if (isset($resp->error)) {
+        watchdog('janrain_capture', 'Failed to retrieve a Capture screen with the following URL: %url', array('%url' => $url),  WATCHDOG_WARNING);
+        $result = '';
+      }
+      else {
+        $result = $resp->data;
+      }
     }
-  }
 
-  if (!$result) {
-    $result = '';
-  }
+    if (!$result) {
+      $result = '';
+    }
 
-  return $result;
+    return $result;
+  }
 }
