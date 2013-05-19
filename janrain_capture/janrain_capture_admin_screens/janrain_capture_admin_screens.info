@@ -1,0 +1,6 @@
+name = Janrain Capture Admin Screens
+description = Adds an administration interface for uploading screens files
+package = Janrain Capture
+core = 7.x
+
+dependencies[] = janrain_capture
