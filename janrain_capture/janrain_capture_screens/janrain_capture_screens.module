@@ -8,7 +8,7 @@
 /**
  * Implements hook_menu_alter().
  */
-function janrain_capture_admin_screens_menu_alter(&$items) {
+function janrain_capture_screens_menu_alter(&$items) {
   $items['admin/config/people/janrain_capture/screens'] = array(
     'title' => 'Screens',
     'page callback' => 'drupal_get_form',
@@ -16,8 +16,8 @@ function janrain_capture_admin_screens_menu_alter(&$items) {
     'access arguments' => array('administer site configuration'),
     'type' => MENU_LOCAL_TASK,
     'weight' => -40,
-    'file' => 'janrain_capture_admin_screens.admin.inc',
-    'file path' => drupal_get_path('module', 'janrain_capture_admin_screens'),
+    'file' => 'janrain_capture_screens.admin.inc',
+    'file path' => drupal_get_path('module', 'janrain_capture_screens'),
   );
 }
 

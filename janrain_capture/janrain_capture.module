@@ -795,7 +795,7 @@ function widget_js() {
   $settings["capture.backplaneBusName"]   = $janrain_settings['backplane_bus_name'];
   $settings["capture.backplaneVersion"]   = $janrain_settings['backplane_version'];
 
-  if (module_exists('janrain_capture_admin_screens')) {
+  if (module_exists('janrain_capture_screens')) {
     $settings["capture.stylesheets"] = "'" . file_create_url(_janrain_capture_get_screen_file('stylesheets/styles.css')) . "'";
     if ($mobile_stylesheet = _janrain_capture_get_screen_file('stylesheets/mobile-styles.css')) {
       $settings["capture.mobileStylesheets"] = "'" . file_create_url($mobile_stylesheet) . "'";
@@ -1377,7 +1377,7 @@ function janrain_capture_theme() {
  * Return empty string on failure to retrieve.
  */
 function _janrain_capture_get_screen($fname) {
-  if (module_exists('janrain_capture_admin_screens')) {
+  if (module_exists('janrain_capture_screens')) {
     if (!in_array($fname, _janrain_capture_get_screens())) {
       return '';
     }
