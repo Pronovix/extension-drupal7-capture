@@ -286,6 +286,15 @@ function janrain_capture_menu() {
     'weight' => -50,
     'file' => "janrain_capture.admin_version.inc",
   );
+  $items['admin/config/people/janrain_capture/screens'] = array(
+    'title' => 'Screens',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('janrain_capture_screens_settings'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => -40,
+    'file' => "janrain_capture.admin_screens.inc",
+  );
   $items['janrain_capture/token_expired/%'] = array(
     'title' => 'Capture Token Expired',
     'page callback' => 'janrain_capture_token_expired',
@@ -786,88 +795,101 @@ function widget_js() {
   $settings["capture.backplaneBusName"]   = $janrain_settings['backplane_bus_name'];
   $settings["capture.backplaneVersion"]   = $janrain_settings['backplane_version'];
 
-  $folder_url  = $janrain_settings['screens_folder'];
-
-  // If path is local, search for user agent-specific stylesheets in the file system.
-  if(strpos($folder_url, 'file:///', 0) === 0) {
-    // Example of $folder_url: file:///sites/all/themes/janrain-capture-screens/
-    $web_path = str_replace('file://', '', $folder_url);
-    // Example of $web_path: /sites/all/themes/janrain-capture-screens/
-    $fs_path = DRUPAL_ROOT . $web_path;
-    // Example of $fs_path: /var/www/d7/sites/all/themes/janrain-capture-screens/
-    //watchdog('janrain_capture', 'Searching for Capture screen stylesheets in: ' . $fs_path,  array(), WATCHDOG_DEBUG);
-    $web_url = $base_url . $web_path;
-
-    $is_nested = is_dir($fs_path.'stylesheets');
-
-    if ($is_nested) {
-      $fs_path .= "stylesheets";
+  if (module_exists('janrain_capture_screens')) {
+    $settings["capture.stylesheets"] = "'" . file_create_url(_janrain_capture_get_screen_file('stylesheets/styles.css')) . "'";
+    if ($mobile_stylesheet = _janrain_capture_get_screen_file('stylesheets/mobile-styles.css')) {
+      $settings["capture.mobileStylesheets"] = "'" . file_create_url($mobile_stylesheet) . "'";
     }
-
-    try {
-      $dir = new DirectoryIterator($fs_path);
+    if ($ie_stylesheet = _janrain_capture_get_screen_file('stylesheets/ie-styles.css')) {
+      $settings["capture.conditionalIEStylesheets"] = "'" . file_create_url($ie_stylesheet) . "'";
     }
-    catch (UnexpectedValueException $e) {
+  }
+  else {
+    $folder_url = variable_get('janrain_capture_screens_folder', array());
+
+    // If path is local, search for user agent-specific stylesheets in the file system.
+    if(strpos($folder_url, 'file:///', 0) === 0) {
+      // Example of $folder_url: file:///sites/all/themes/janrain-capture-screens/
+      $web_path = str_replace('file://', '', $folder_url);
+      // Example of $web_path: /sites/all/themes/janrain-capture-screens/
+      $fs_path = DRUPAL_ROOT . $web_path;
+      // Example of $fs_path: /var/www/d7/sites/all/themes/janrain-capture-screens/
+      //watchdog('janrain_capture', 'Searching for Capture screen stylesheets in: ' . $fs_path,  array(), WATCHDOG_DEBUG);
+      $web_url = $base_url . $web_path;
+
+      $is_nested = is_dir($fs_path.'stylesheets');
+
       if ($is_nested) {
-        $screens_message = 'No "stylesheets" subfolder found in the screens folder (@path). Please check the Janrain Capture module settings.';
-        
-      } else {
-        $screens_message = 'The screens folder (@path) could not be found. Please check the Janrain Capture module settings.';
+        $fs_path .= "stylesheets";
       }
 
-      watchdog('janrain_capture',
-               $screens_message,
-               array('@path' => $fs_path),
-               WATCHDOG_WARNING,
-               l(t('Janrain Capture module settings'), 'admin/config/people/janrain_capture'));
+      try {
+        $dir = new DirectoryIterator($fs_path);
+      }
+      catch (UnexpectedValueException $e) {
+        if ($is_nested) {
+          $screens_message = 'No "stylesheets" subfolder found in the screens folder (@path). Please check the Janrain Capture module settings.';
+          
+        } else {
+          $screens_message = 'The screens folder (@path) could not be found. Please check the Janrain Capture module settings.';
+        }
 
-      return;
-    }
+        watchdog('janrain_capture',
+                 $screens_message,
+                 array('@path' => $fs_path),
+                 WATCHDOG_WARNING,
+                 l(t('Janrain Capture module settings'), 'admin/config/people/janrain_capture'));
 
-    if ($is_nested) {
-      $web_url .= "stylesheets/";
-    }
+        return;
+      }
 
-    $css = array();
-    $css_mobile = array();
-    $css_ie = array();
-    if ($dir) {
-      foreach ($dir as $fileinfo) {
-        $fn = $fileinfo->getFilename();
-        if (!$fileinfo->isDot() && stripos($fn,'.css')) {
-          switch (true){
-            // if file begins with mobile set is as a mobile style
-          case (stripos($fn, 'mobile') === 0):
-            $css_mobile[] = "'{$web_url}{$fn}'";
-            break;
-            // if file begins with ie set is as an IE style
-          case (stripos($fn, 'ie') === 0):
-            $css_ie[] = "'{$web_url}{$fn}'";
-            break;
-            // otherwise set it as a normal style
-          default:
-            $css[] = "'{$web_url}{$fn}'";
-            break;
+      if ($is_nested) {
+        $web_url .= "stylesheets/";
+      }
+
+      $css = array();
+      $css_mobile = array();
+      $css_ie = array();
+      if ($dir) {
+        foreach ($dir as $fileinfo) {
+          $fn = $fileinfo->getFilename();
+          if (!$fileinfo->isDot() && stripos($fn,'.css')) {
+            switch (true){
+              // if file begins with mobile set is as a mobile style
+            case (stripos($fn, 'mobile') === 0):
+              $css_mobile[] = "'{$web_url}{$fn}'";
+              break;
+              // if file begins with ie set is as an IE style
+            case (stripos($fn, 'ie') === 0):
+              $css_ie[] = "'{$web_url}{$fn}'";
+              break;
+              // otherwise set it as a normal style
+            default:
+              $css[] = "'{$web_url}{$fn}'";
+              break;
+            }
           }
         }
       }
+      $settings["capture.stylesheets"] = implode(', ', $css);
+      $settings["capture.mobileStylesheets"] = implode(', ', $css_mobile);
+      $settings["capture.conditionalIEStylesheets"] = implode(', ', $css_ie);
+    } else {
+      // just grab a single remote sheet
+      $settings["capture.stylesheets"] = "'{$folder_url}styles.css'";
     }
-    $settings["capture.stylesheets"] = implode(', ', $css);
-    $settings["capture.mobileStylesheets"] = implode(', ', $css_mobile);
-    $settings["capture.conditionalIEStylesheets"] = implode(', ', $css_ie);
-  } else {
-    // just grab a single remote sheet
-    $settings["capture.stylesheets"] = "'{$folder_url}styles.css'";
+
+    // Log a warning if directories are setup properly but no stylesheets were found
+    if (!count($css) && !count($css_mobile) && !count($css_ie)) {
+      watchdog('janrain_capture',
+                 'No stylesheets were found in the screens folder (@path). Please check the Janrain Capture module settings.',
+                 array('@path' => $fs_path),
+                 WATCHDOG_WARNING,
+                 l(t('Janrain Capture module settings'), 'admin/config/people/janrain_capture'));
+    }
   }
 
-  // Log a warning if directories are setup properly but no stylesheets were found
-  if (!count($css) && !count($css_mobile) && !count($css_ie)) {
-    watchdog('janrain_capture',
-               'No stylesheets were found in the screens folder (@path). Please check the Janrain Capture module settings.',
-               array('@path' => $fs_path),
-               WATCHDOG_WARNING,
-               l(t('Janrain Capture module settings'), 'admin/config/people/janrain_capture'));
-  }
+  
 
   $output = <<<EOD
 function janrainSignOut(){
@@ -1354,42 +1376,55 @@ function janrain_capture_theme() {
  * Return empty string on failure to retrieve.
  */
 function _janrain_capture_get_screen($fname) {
-  $conf = variable_get('janrain_capture_ui2', array());
-  if (!isset($conf['screens_folder'])) {
-    watchdog('janrain_capture', 'No Capture screens folder specified in the Janrain Capture settings.',  array(), WATCHDOG_WARNING);
+  if (module_exists('janrain_capture_screens')) {
+    if (!in_array($fname, _janrain_capture_get_screens())) {
+      return '';
+    }
+
+    if ($screen_file = _janrain_capture_get_screen_file($fname)) {
+      return file_get_contents($screen_file);
+    }
+
     return '';
   }
-  $url = $conf['screens_folder'];
-
-  if (strpos($url, 'file:///', 0) === 0) {
-    global $base_path;
-
-    $path = DRUPAL_ROOT . str_replace('file://', '', $url) . $fname;
-    $result = file_get_contents($path);
-  }
   else {
-    $url_type = isset( $_REQUEST['url_type'] ) ? $_REQUEST['url_type'] : false;
-
-    // allow only alpha-numeric (and dashes) to prevent hijacking
-    if ( ! ctype_alnum( str_replace( '-', '', $url_type ) ) ) {
-      header( 'HTTP/1.1 400 Bad Request' );
-      exit();
+    $url = variable_get('janrain_capture_screens_folder', array());
+    if (!isset($url)) {
+      watchdog('janrain_capture', 'No Capture screens folder specified in the Janrain Capture settings.',  array(), WATCHDOG_WARNING);
+      return '';
     }
+    //$url = $conf['screens_folder'];
 
-    $url .= $fname;
-    $resp = drupal_http_request($url);
-    if (isset($resp->error)) {
-      watchdog('janrain_capture', 'Failed to retrieve a Capture screen with the following URL: %url', array('%url' => $url),  WATCHDOG_WARNING);
-      $result = '';
+    if (strpos($url, 'file:///', 0) === 0) {
+      global $base_path;
+
+      $path = DRUPAL_ROOT . str_replace('file://', '', $url) . $fname;
+      $result = file_get_contents($path);
     }
     else {
-      $result = $resp->data;
+      $url_type = isset( $_REQUEST['url_type'] ) ? $_REQUEST['url_type'] : false;
+
+      // allow only alpha-numeric (and dashes) to prevent hijacking
+      if ( ! ctype_alnum( str_replace( '-', '', $url_type ) ) ) {
+        header( 'HTTP/1.1 400 Bad Request' );
+        exit();
+      }
+
+      $url .= $fname;
+      $resp = drupal_http_request($url);
+      if (isset($resp->error)) {
+        watchdog('janrain_capture', 'Failed to retrieve a Capture screen with the following URL: %url', array('%url' => $url),  WATCHDOG_WARNING);
+        $result = '';
+      }
+      else {
+        $result = $resp->data;
+      }
     }
-  }
 
-  if (!$result) {
-    $result = '';
-  }
+    if (!$result) {
+      $result = '';
+    }
 
-  return $result;
+    return $result;
+  }
 }
