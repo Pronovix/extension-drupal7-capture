@@ -805,7 +805,6 @@ function widget_js() {
     }
   }
   else {
-    //$folder_url  = $janrain_settings['screens_folder'];
     $folder_url = variable_get('janrain_capture_screens_folder', array());
 
     // If path is local, search for user agent-specific stylesheets in the file system.
