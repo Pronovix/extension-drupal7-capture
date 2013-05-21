@@ -13,9 +13,8 @@ function janrain_capture_version_settings() {
   $form['description'] = array(
     '#markup' => '<p>' . t('Connection to Janrain Capture requires a subscription. Once subscribed, use the values on the Janrain dashboard to complete the fields below to connect the service.') . '</p>',
   );
-  $janrain_capture_ver = variable_get('janrain_capture_ver', array());
-  $ver = !empty($janrain_capture_ver) ? $janrain_capture_ver : 'empty';
-  
+  $janrain_capture_ver = variable_get('janrain_capture_ver', '1.0');
+
   $form['janrain_capture_ver'] = array(
     '#type' => 'select',
     '#title' => t('Capture Version'),

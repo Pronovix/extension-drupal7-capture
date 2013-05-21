@@ -28,7 +28,7 @@ function janrain_capture_init() {
     return;
   }
 
-  $ver = variable_get('janrain_capture_ver', array());
+  $ver = variable_get('janrain_capture_ver', '1.0');
   janrain_capture_ini($ver);
 }
 
@@ -36,7 +36,7 @@ function janrain_capture_init() {
  * Implements hook_page_build().
  */
 function janrain_capture_page_build(&$page) {
-  if (variable_get('janrain_capture_ver', '2.0') == '1.0') {
+  if (variable_get('janrain_capture_ver', '1.0') == '1.0') {
     return;
   }
 
@@ -182,7 +182,7 @@ function janrain_capture_ini($ver = '1.0') {
     }
   } else {
     $scripts['external'][] = 'https://d7v0k4dt27zlp.cloudfront.net/assets/capture_client.js';
-    $scripts['inline'][] = widget_js();
+    $scripts['inline'][] = janrain_capture_widget_js();
   }
   
   foreach ($scripts['file'] as $s) {
@@ -200,7 +200,7 @@ function janrain_capture_ini($ver = '1.0') {
  * Settings menu item callback
  */
 function janrain_capture_get_settings() {
-  $janrain_capture_ver = variable_get('janrain_capture_ver', array());
+  $janrain_capture_ver = variable_get('janrain_capture_ver', '1.0');
   $ver = !empty($janrain_capture_ver) ? $janrain_capture_ver : '1.0';
 
   if ($ver == '1.0') {
@@ -263,7 +263,7 @@ function janrain_capture_menu() {
     'file' => 'janrain_capture.pages.inc',
   );
 
-  $janrain_capture_ver = variable_get('janrain_capture_ver', array());
+  $janrain_capture_ver = variable_get('janrain_capture_ver', '1.0');
   $ver = !empty($janrain_capture_ver) ? $janrain_capture_ver : '1.0';
   $ver = substr($ver,0,1);
   if($ver == "1") {$ver = '';}
@@ -441,7 +441,7 @@ function janrain_capture_configured() {
  */
 function janrain_capture_url($options = NULL) {
   //TODO: set new
-  $ver = variable_get('janrain_capture_ver', array());
+  $ver = variable_get('janrain_capture_ver', '1.0');
   if ($ver == '1.0') {
     $janrain_capture_main = variable_get('janrain_capture_main', array());
     $janrain_capture_optional = variable_get('janrain_capture_optional', array());
@@ -573,7 +573,7 @@ function janrain_capture_block_view_user_login_alter(&$data, $block) {
  * Returns a render array for the 'Register / Sign in' link for Janrain Capture.
  */
 function janrain_capture_signin_link() {
-  $ver = variable_get('janrain_capture_ver', array());
+  $ver = variable_get('janrain_capture_ver', '1.0');
   if($ver == '1.0') {
     $link = array(
       '#type' => 'link',
@@ -622,7 +622,7 @@ function janrain_capture_profile_link() {
  * Generates a 'Logout' link for Janrain Capture.
  */
 function janrain_capture_render_logout_link() {
-  $ver = variable_get('janrain_capture_ver', array());
+  $ver = variable_get('janrain_capture_ver', '1.0');
   if($ver == '1.0') {
     $janrain_capture_optional = variable_get('janrain_capture_optional', array());
   } else {
@@ -671,7 +671,7 @@ function janrain_capture_block_content() {
  *   The Janrain Capture profile array.
  */
 function janrain_capture_sync_account($account, $profile) {
-  $ver = variable_get('janrain_capture_ver', array());
+  $ver = variable_get('janrain_capture_ver', '1.0');
   $janrain_capture_fields = ($ver == '1.0') ?
     variable_get('janrain_capture_fields', array()) :
     variable_get('janrain_capture_fields2', array());
@@ -754,7 +754,7 @@ function _janrain_capture_update_picture($account, $variant) {
 /**
  * Returns Capture widget js.
  */
-function widget_js() {
+function janrain_capture_widget_js() {
   global $base_url;
   global $base_path;
 
@@ -1022,7 +1022,7 @@ function janrain_capture_share_js() {
     $url = $conf2['engage_address'];
     $app_alias = str_replace(array('https://', 'http://', '.rpxnow.com'), '', $url);
   }
-  $ver = variable_get('janrain_capture_ver', array());
+  $ver = variable_get('janrain_capture_ver', '1.0');
 
   // Add Social Sharing related code.
   $output = '<!-- Begin Janrain Engage Social Sharing. Visit http://www.rpxnow.com/ -->';
