@@ -20,7 +20,7 @@ function janrain_capture_oauth() {
     $destination = isset($_REQUEST['destination']) ? $_REQUEST['destination'] : false;
   }
   $url_type = isset($_REQUEST['url_type']) ? $_REQUEST['url_type'] : false;
-  $ver = variable_get('janrain_capture_ver', array());
+  $ver = variable_get('janrain_capture_ver', '1.0');
 
   if ($ver == '1.0') {
     $janrain_capture_fields   = variable_get('janrain_capture_fields', array());
@@ -36,7 +36,7 @@ function janrain_capture_oauth() {
     if (isset($_REQUEST['verification_code'])) { $url_type='verify'; }
     // do we need to output like verify or forgot
     if ($url_type) {
-      $widget_js = widget_js();
+      $widget_js = janrain_capture_widget_js();
       $screen = _janrain_capture_get_screen("{$url_type}.html");
       $js = _janrain_capture_get_screen("{$url_type}.js");
 

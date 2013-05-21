@@ -84,7 +84,7 @@ function janrain_capture_ui_get_library_path($name) {
  */
 function janrain_capture_ui_user_view($account) {
   global $base_url;
-  $ver = variable_get('janrain_capture_ver', array());
+  $ver = variable_get('janrain_capture_ver', '1.0');
   $janrain_capture_ui = variable_get('janrain_capture_ui2', array());
   
   if($ver == '1.0'
@@ -149,7 +149,7 @@ function janrain_capture_ui_form_user_profile_form_alter(&$form, &$form_state) {
     );
     if ($user->uid == $account->uid) {
       // test 1.0 or 2.0
-      $ver = variable_get('janrain_capture_ver', array());
+      $ver = variable_get('janrain_capture_ver', '1.0');
       if($ver == '2.0') {
         
         $janrain_capture_ui = variable_get('janrain_capture_ui2', array());
