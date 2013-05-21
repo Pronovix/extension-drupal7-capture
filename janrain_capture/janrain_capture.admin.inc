@@ -9,12 +9,6 @@
  * Sets up the admin settings form for this module.
  */
 function janrain_capture_settings() {
-  $form['description'] = array(
-    '#markup' => '<p>' . t('Connection to Janrain Capture requires a subscription. Once subscribed, use the values on the Janrain dashboard to complete the fields below to connect the service.') . '</p>',
-  );
-  $janrain_capture_ver = variable_get('janrain_capture_ver', '1.0');
-  $ver = !empty($janrain_capture_ver) ? $janrain_capture_ver : '1.0';
-  
   $janrain_capture_main = variable_get('janrain_capture_main', array());
   $form['janrain_capture_main'] = array(
     '#type' => 'fieldset',

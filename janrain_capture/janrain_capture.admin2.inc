@@ -10,11 +10,6 @@
  */
 function janrain_capture_settings() {
   global $base_url;
-  $form['description'] = array(
-    '#markup' => '<p>' . t('Connection to Janrain Capture requires a subscription. Once subscribed, use the values on the Janrain dashboard to complete the fields below to connect the service.') . '</p>',
-  );
-  $janrain_capture_ver = variable_get('janrain_capture_ver', '1.0');
-  $ver = !empty($janrain_capture_ver) ? $janrain_capture_ver : 'empty';
   
   $janrain_capture_main = variable_get('janrain_capture_main2', array());
   $form['janrain_capture_main2'] = array(
