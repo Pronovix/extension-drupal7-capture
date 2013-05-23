@@ -1337,8 +1337,6 @@ function theme_janrain_capture_icon($variables) {
 
   if (isset($variables['node'])) {
     $nid = $variables['node']->nid;
-  } else {
-    $nid = rand(1,1000);
   }
   $size = $variables['size'] == 'small' ? '16' : '32';
   $style = array(
