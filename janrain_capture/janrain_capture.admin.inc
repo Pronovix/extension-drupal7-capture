@@ -252,17 +252,6 @@ function janrain_capture_settings_validate($form, &$form_state) {
         empty($form_state['values']['janrain_capture_main']['capture_address'])) {
       form_set_error('janrain_capture_enforce', t('You cannot enforce Janrain Capture for login because you have not configured the application settings. You must at least provide a Janrain Capture Client ID, Janrain Capture Client Secret and Janrain Capture Address'));
     }
-    else {
-      // Do not allow the current user to set the "enforce" property if they do
-      // not have a Capture account themselves. Otherwise they could lock themselves
-      // out of the site.
-      $api = new JanrainCaptureApi();
-      $profile = $api->loadUserEntity();
-
-      if (!$profile) {
-        form_set_error('janrain_capture_enforce', t('You cannot enforce Janrain Capture for login because you do not have a Janrain Capture account and would no longer be able to log into this site.'));
-      }
-    }
   }
 
   if ($form_state['values']['janrain_capture_fields']['capture_match_email'] && !$form_state['values']['janrain_capture_fields']['capture_enforce_verification']) {
