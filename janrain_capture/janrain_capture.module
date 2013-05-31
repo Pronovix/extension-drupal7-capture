@@ -494,7 +494,7 @@ function janrain_capture_url_outbound_alter(&$path, &$options, $original_path) {
   // Override logout link
   switch ($path) {
     case 'user/logout':
-      $ver = variable_get('janrain_capture_ver', array());
+      $ver = variable_get('janrain_capture_ver', '1.0');
 
       if ($ver == '1.0') {
         $conf = variable_get('janrain_capture_optional', array());
