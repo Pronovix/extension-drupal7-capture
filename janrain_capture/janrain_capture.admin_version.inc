@@ -9,7 +9,6 @@
  * Sets the Capture version.
  */
 function janrain_capture_version_settings() {
-  global $base_url;
   $form['description'] = array(
     '#markup' => '<p>' . t('Connection to Janrain Capture requires a subscription. Once subscribed, use the values on the Janrain dashboard to complete the fields below to connect the service.') . '</p>',
   );
@@ -23,8 +22,9 @@ function janrain_capture_version_settings() {
       '1.0' => t('Capture Legacy'),
     ),
     '#default_value' => !empty($janrain_capture_ver) ? $janrain_capture_ver : '1.0',
-    '#description' => t('The version of Capture you are using. Please select a version and save this form before modifying Capture settings.'),
+    '#description' => t('Which version of capture are you using? Chose and save before configuring. Settings below will change accordingly and are stored separately.'),
   );
 
   return system_settings_form($form);
 }
+
