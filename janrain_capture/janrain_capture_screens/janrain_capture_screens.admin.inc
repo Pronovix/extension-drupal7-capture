@@ -19,6 +19,10 @@ function _janrain_capture_get_screen_title($screen) {
   $parts = explode('.', $screen);
   $filename = $parts[0];
 
+  if ($filename == 'signin') {
+    $filename = 'Sign in';
+  }
+
   $screen_title = ucfirst(str_replace('-', ' ', $filename));
   return t($screen_title);
 }
